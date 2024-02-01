@@ -1,20 +1,35 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet } from "react-native";
+import StackNavigator from "./navigation/StackNavigator";
+import * as SplashScreen from "expo-splash-screen";
+import * as Font from "expo-font";
+import React, { useEffect, useState } from "react";
+import { StatusBar } from "expo-status-bar";
 
 export default function App() {
+  const [isFontLoaded, setFontLoaded] = useState(false);
+
+  useEffect(() => {
+    const loadFont = async () => {
+      await Font.loadAsync({
+        "OpenSans-Regular": require("./assets/font/OpenSans-Regular.ttf"),
+      });
+
+      setFontLoaded(true);
+      await SplashScreen.hideAsync();
+    };
+
+    loadFont();
+  }, []);
+
+  if (!isFontLoaded) {
+    return null;
+  }
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <>
+      <StackNavigator />
+      <StatusBar style="auto" backgroundColor="#fff" />
+    </>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+const styles = StyleSheet.create({});
