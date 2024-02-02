@@ -21,7 +21,7 @@ import {
 } from "react-native-responsive-screen";
 import MenuHeader from "../../Component/MenuHeader";
 
-const DomainName = ({ route }) => {
+const SearchDomain = ({ route }) => {
   const { datadomain } = route.params || {};
   const navigation = useNavigation();
   const [domain, setDomain] = useState(datadomain || "");
@@ -45,7 +45,7 @@ const DomainName = ({ route }) => {
     try {
       const url = `https://backend.websouls.com/api/currencies/serachDomain?domain=${domain}&suggestedTlds=net,com&domianTyp=domainregister`;
       const response = await axios.post(url);
-      console.log("Response:", response.data);
+      // console.log("Response:", response.data);
       setResponse(response.data);
     } catch (error) {
       console.error("Error fetching data: ", error);
@@ -248,7 +248,7 @@ const DomainName = ({ route }) => {
   );
 };
 
-export default DomainName;
+export default SearchDomain;
 
 const styles = StyleSheet.create({
   container: {

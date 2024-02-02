@@ -95,9 +95,11 @@ const Header = () => {
               paddingRight: 13,
             }}
           >
-            +923214776996
+            +923214776995
           </Text>
-          <FontAwesome name="shopping-cart" size={24} color="#fff" />
+          <TouchableOpacity>
+            <FontAwesome name="shopping-cart" size={24} color="#fff" />
+          </TouchableOpacity>
         </View>
       </View>
     </SafeAreaView>

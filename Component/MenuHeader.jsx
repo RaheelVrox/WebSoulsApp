@@ -7,10 +7,10 @@ const MenuHeader = () => {
     <View style={styles.logocontainer}>
       <Image
         source={require("../assets/logo.png")}
-        style={{ width: 80, height: 60, resizeMode: "contain" }}
+        style={{ width: 90, height: 60, resizeMode: "contain" }}
       />
       <TouchableOpacity>
-        <MaterialIcons name="menu" size={32} color="black" />
+        <MaterialIcons name="menu" size={35} color="black" />
       </TouchableOpacity>
     </View>
   );

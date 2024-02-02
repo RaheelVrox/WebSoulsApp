@@ -15,7 +15,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import { MaterialIcons, FontAwesome } from "@expo/vector-icons";
+import { FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import MenuHeader from "../../Component/MenuHeader";
 
@@ -27,7 +27,7 @@ const FrontPage = () => {
     if (!datadomain.trim()) {
       Alert.alert("Validation", "Please enter a perfect domain name.");
     } else {
-      navigation.navigate("DomainName", { datadomain: datadomain });
+      navigation.navigate("SearchDomain", { datadomain: datadomain });
     }
   };
 
@@ -106,7 +106,10 @@ const FrontPage = () => {
                 Means Ideal Traffic
               </Text>
             </View>
-            <TouchableOpacity style={{ width: "28%" }}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("FindDomain")}
+              style={{ width: "28%" }}
+            >
               <View
                 style={{
                   borderRadius: 5,
@@ -340,7 +343,7 @@ const FrontPage = () => {
             </TouchableOpacity>
           </View>
           <View style={styles.ArrowsRow}>
-            <TouchableOpacity>
+            {/* <TouchableOpacity>
               <MaterialIcons
                 name="keyboard-arrow-left"
                 size={32}
@@ -354,7 +357,7 @@ const FrontPage = () => {
                 size={32}
                 color="black"
               />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
         </View>
       </ScrollView>
@@ -369,7 +372,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
-
   backgroundImage: {
     borderTopWidth: 1,
     borderBottomWidth: 5,

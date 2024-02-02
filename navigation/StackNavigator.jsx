@@ -3,8 +3,9 @@ import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { NavigationContainer } from "@react-navigation/native";
 import Header from "../Component/Header";
-import DomainName from "../scr/DomainName/DomainName";
+import SearchDomain from "../scr/SearchDomain/SearchDomain";
 import FrontPage from "../scr/FrontPage/FrontPage";
+import FindDomain from "../scr/SearchDomain/FindDomain";
 const StackNavigator = () => {
   const Stack = createNativeStackNavigator();
   return (
@@ -18,8 +19,15 @@ const StackNavigator = () => {
           }}
         />
         <Stack.Screen
-          name="DomainName"
-          component={DomainName}
+          name="SearchDomain"
+          component={SearchDomain}
+          options={{
+            header: () => <Header />,
+          }}
+        />
+        <Stack.Screen
+          name="FindDomain"
+          component={FindDomain}
           options={{
             header: () => <Header />,
           }}
