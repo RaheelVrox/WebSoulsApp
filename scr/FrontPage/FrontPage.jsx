@@ -3,14 +3,13 @@ import {
   Text,
   View,
   SafeAreaView,
-  Image,
   ImageBackground,
   TouchableOpacity,
   TextInput,
   ScrollView,
   Alert,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -18,10 +17,14 @@ import {
 import { FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import MenuHeader from "../../Component/MenuHeader";
+import axios from "axios";
 
 const FrontPage = () => {
   const navigation = useNavigation();
   const [datadomain, setDomain] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [response, setResponse] = useState([]);
+  const [error, setError] = useState("");
   const handleSearch = () => {
     console.log("search domain:", datadomain);
     if (!datadomain.trim()) {
@@ -30,6 +33,27 @@ const FrontPage = () => {
       navigation.navigate("SearchDomain", { datadomain: datadomain });
     }
   };
+
+  const Corporate = async () => {
+    setLoading(true);
+    try {
+      const url = `https://backend.websouls.com/api/currencies/dump_test?p_id=184,107,324,280`;
+      const response = await axios.get(url);
+      setResponse(response.data);
+    } catch (error) {
+      console.error("Error fetching data: ", error);
+      if (error.response && error.response.status === 502) {
+        setError("Please search valid domain name/tld.");
+      } else {
+        setError(error.message);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    Corporate();
+  }, []);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#000000" }}>
@@ -117,7 +141,7 @@ const FrontPage = () => {
                   justifyContent: "center",
                   alignItems: "center",
                   textAlign: "center",
-                  height: hp(6.5),
+                  height: hp(6),
                   width: wp(45),
                   margin: 20,
                 }}
@@ -194,171 +218,140 @@ const FrontPage = () => {
             </Text>
           </View>
           <View style={styles.divider}></View>
-          <View
-            style={{
-              backgroundColor: "#f8f8f8",
-              padding: 20,
-              marginHorizontal: 15,
-              marginTop: 20,
-            }}
-          >
-            <Text
-              style={{
-                textAlign: "center",
-                color: "#4d4e4f",
-                fontWeight: "bold",
-                fontSize: 20,
-                fontFamily: "OpenSans-Regular",
-              }}
-            >
-              CORPORATE
-            </Text>
-            <Text
-              style={{
-                textAlign: "center",
-                color: "#4d4e4f",
-                fontWeight: "600",
-                fontSize: 17,
-                fontFamily: "OpenSans-Regular",
-              }}
-            >
-              MAXIMIZED
-            </Text>
+          {response.map((item) => (
             <View
+              key={item.id}
               style={{
-                backgroundColor: "#005880",
-                padding: 15,
-                marginTop: 15,
+                backgroundColor: "#f8f8f8",
+                padding: 20,
+                marginHorizontal: 15,
+                marginTop: 20,
               }}
             >
-              <Text style={styles.strikeThrough}>Normal Price: 33232.52</Text>
               <Text
                 style={{
-                  fontSize: 20,
                   textAlign: "center",
-                  color: "#fff",
+                  color: "#4d4e4f",
                   fontWeight: "bold",
-                  fontFamily: "OpenSans-Regular",
+                  fontSize: 20,
                   marginBottom: 5,
+                  fontFamily: "OpenSans-Regular",
+                  textTransform: "uppercase",
                 }}
               >
-                Rs21601/Yr<Text style={{ color: "red" }}>*</Text>
+                {item.name.toUpperCase()}
               </Text>
               <Text
                 style={{
-                  fontSize: 13,
                   textAlign: "center",
-                  color: "#fff",
-                  fontWeight: "700",
+                  color: "#4d4e4f",
+                  fontWeight: "600",
+                  fontSize: 17,
                   fontFamily: "OpenSans-Regular",
                 }}
               >
-                Rs33232.52/Yr when you renew
+                {item.fname}
               </Text>
               <View
                 style={{
-                  backgroundColor: "#004e71",
-                  marginTop: 10,
-                  flexDirection: "row",
-                  justifyContent: "center",
-                  alignItems: "center",
+                  backgroundColor: "#005880",
+                  padding: 15,
+                  marginTop: 15,
                 }}
               >
+                <Text style={styles.strikeThrough}>
+                  Normal Price: {item.currency[0].annually}
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 20,
+                    textAlign: "center",
+                    color: "#fff",
+                    fontWeight: "bold",
+                    fontFamily: "OpenSans-Regular",
+                    marginBottom: 5,
+                  }}
+                >
+                  Rs21601/Yr<Text style={{ color: "red" }}>*</Text>
+                </Text>
                 <Text
                   style={{
                     fontSize: 13,
+                    textAlign: "center",
                     color: "#fff",
                     fontWeight: "700",
                     fontFamily: "OpenSans-Regular",
                   }}
                 >
-                  On Sale - {""}
+                  Rs{item.currency[0].annually}/Yr when you renew
                 </Text>
                 <View
                   style={{
-                    borderRadius: 5,
-                    backgroundColor: "#6fce32",
+                    backgroundColor: "#004e71",
+                    marginTop: 10,
+                    flexDirection: "row",
                     justifyContent: "center",
                     alignItems: "center",
-                    height: hp(3.5),
-                    width: wp(25),
-                    marginBottom: 5,
                   }}
                 >
                   <Text
                     style={{
+                      fontSize: 13,
                       color: "#fff",
                       fontWeight: "700",
-                      fontSize: 16,
                       fontFamily: "OpenSans-Regular",
                     }}
                   >
-                    Save 30%
+                    On Sale - {""}
                   </Text>
+                  <View
+                    style={{
+                      borderRadius: 5,
+                      backgroundColor: "#6fce32",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      height: hp(3.5),
+                      width: wp(25),
+                      marginBottom: 5,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: "#fff",
+                        fontWeight: "700",
+                        fontSize: 16,
+                        fontFamily: "OpenSans-Regular",
+                      }}
+                    >
+                      Save 30%
+                    </Text>
+                  </View>
                 </View>
               </View>
+              <View style={{ marginTop: 25 }}>
+                {item.packageFeatures[0].features.map((feature, index) => {
+                  // Use regular expression to match the "Resource Allocated" part
+                  const match = feature.match(/^(.*?)_/);
+                  // Extract the matched part or use the whole feature if not matched
+                  const resourceAllocated = match ? match[1] : feature;
+                  return (
+                    <View key={index}>
+                      <Text style={styles.packagestext}>
+                        {resourceAllocated}
+                      </Text>
+                      <View style={styles.dividerr}></View>
+                    </View>
+                  );
+                })}
+              </View>
+              <TouchableOpacity style={{ alignSelf: "center" }}>
+                <View style={styles.startbutton}>
+                  <Text style={styles.buttonText}>Get Started</Text>
+                </View>
+              </TouchableOpacity>
             </View>
-            <View style={{ marginTop: 20 }}>
-              <Text style={styles.packagestext}>100GB SSD Disk Space </Text>
-              <View style={styles.dividerr}></View>
-              <View style={styles.rowContainer}>
-                <Text style={styles.packagestext}>Resource Allocated</Text>
-                <FontAwesome
-                  name="info-circle"
-                  size={18}
-                  color="#005880"
-                  style={{ marginLeft: 10 }}
-                />
-              </View>
-              <View style={styles.dividerr}></View>
-              <Text style={styles.packagestext}>
-                Advanced Malware Scanning Included
-              </Text>
-              <View style={styles.dividerr}></View>
-              <View style={styles.rowContainer}>
-                <Text style={styles.packagestext}> FREE Domain Included </Text>
-                <FontAwesome
-                  name="info-circle"
-                  size={18}
-                  color="#005880"
-                  style={{ marginLeft: 10 }}
-                />
-              </View>
-              <View style={styles.dividerr}></View>
-              <Text style={styles.packagestext}> Unlimited Bandwidth </Text>
-              <View style={styles.dividerr}></View>
-              <Text style={styles.packagestext}> Unlimited Email Accounts</Text>
-              <View style={styles.dividerr}></View>
-              <Text style={styles.packagestext}> Unlimited Databases </Text>
-              <View style={styles.dividerr}></View>
-              <Text style={styles.packagestext}>
-                1 Click Install of Free Applications
-              </Text>
-              <View style={styles.dividerr}></View>
-            </View>
-            <TouchableOpacity style={{ alignSelf: "center" }}>
-              <View style={styles.startbutton}>
-                <Text style={styles.buttonText}>Get Started</Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.ArrowsRow}>
-            {/* <TouchableOpacity>
-              <MaterialIcons
-                name="keyboard-arrow-left"
-                size={32}
-                color="black"
-              />
-            </TouchableOpacity>
-            <View style={{ width: 40 }} />
-            <TouchableOpacity>
-              <MaterialIcons
-                name="keyboard-arrow-right"
-                size={32}
-                color="black"
-              />
-            </TouchableOpacity> */}
-          </View>
+          ))}
+          <View style={styles.ArrowsRow}></View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -384,8 +377,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     textAlign: "center",
-    height: hp(6.5),
-    width: wp(30),
+    height: hp(6),
+    width: wp(39),
     margin: 20,
   },
   buttonText: {
@@ -452,15 +445,15 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: "#e1e1e1",
     marginBottom: 10,
-    marginTop: 10,
+    marginTop: 15,
   },
   startbutton: {
     borderRadius: 5,
     backgroundColor: "#6fce32",
     justifyContent: "center",
     alignItems: "center",
-    height: hp(6.5),
-    width: wp(38),
+    height: hp(6),
+    width: wp(39),
     marginTop: 20,
   },
   ArrowsRow: {

@@ -32,6 +32,9 @@ const FindDomain = () => {
   const [otherDomains, setOtherDomains] = useState(null);
   const [selectedTLD, setSelectedTLD] = useState(null);
 
+  const toggleTLDVisibility = (tld) => {
+    setSelectedTLD(selectedTLD === tld ? null : tld);
+  };
   const handleTLDPress = (index) => {
     setSelectedTLD(selectedTLD === index ? null : index);
   };
@@ -48,6 +51,7 @@ const FindDomain = () => {
     }
   };
 
+  // searchDomain
   const searchDomain = async () => {
     setLoading(true);
     try {
@@ -293,8 +297,8 @@ const FindDomain = () => {
                                   alignItems: "center",
                                   alignSelf: "center",
                                   textAlign: "center",
-                                  height: hp(6.5),
-                                  width: wp(36),
+                                  height: hp(6),
+                                  width: wp(39),
                                   margin: 42,
                                 }}
                               >
@@ -393,7 +397,6 @@ const FindDomain = () => {
                     </Text>
                   </TouchableOpacity>
                 </View>
-
                 <View style={{ flex: 1, marginBottom: 35 }}>
                   {activeTab === "Popular" &&
                     popularDomains &&
@@ -401,107 +404,86 @@ const FindDomain = () => {
                       <View key={index} style={{ paddingTop: 40 }}>
                         <View>
                           <View style={styles.dividerr}></View>
-                          <Text
-                            style={{
-                              textAlign: "center",
-                              color: "#005a7e",
-                              fontFamily: "OpenSans-Regular",
-                              fontSize: 20,
-                              fontWeight: "700",
-                              marginBottom: 10,
-                            }}
+                          <TouchableWithoutFeedback
+                            onPress={() => toggleTLDVisibility(item.name)}
                           >
-                            .{item.name}
-                          </Text>
-                          {item.name && item.name.endsWith("pk") ? (
                             <View>
-                              <Text
-                                style={{
-                                  textAlign: "center",
-                                  color: "#414042",
-                                  fontFamily: "OpenSans-Regular",
-                                  fontSize: 20,
-                                  fontWeight: "700",
-                                }}
-                              >
-                                <Text
+                              {selectedTLD !== item.name ? (
+                                <>
+                                  <Text
+                                    style={{
+                                      textAlign: "center",
+                                      color: "#005a7e",
+                                      fontFamily: "OpenSans-Regular",
+                                      fontSize: 20,
+                                      fontWeight: "700",
+                                      marginBottom: 10,
+                                    }}
+                                  >
+                                    .{item.name}
+                                  </Text>
+                                  <Text
+                                    style={{
+                                      textAlign: "center",
+                                      color: "#414042",
+                                      fontFamily: "OpenSans-Regular",
+                                      fontSize: 20,
+                                      fontWeight: "700",
+                                    }}
+                                  >
+                                    <Text
+                                      style={{
+                                        color: "#414042",
+                                        fontSize: 18,
+                                        fontWeight: "600",
+                                        fontFamily: "OpenSans-Regular",
+                                      }}
+                                    >
+                                      Rs
+                                    </Text>
+                                    {item.name && item.name.endsWith("pk")
+                                      ? `${item.curency[0].biennially}/2yrs`
+                                      : `${item.curency[0].annually}/yr`}
+                                    <Text
+                                      style={{
+                                        color: "red",
+                                        fontSize: 20,
+                                        fontWeight: "700",
+                                        fontFamily: "OpenSans-Regular",
+                                      }}
+                                    >
+                                      *
+                                    </Text>
+                                  </Text>
+                                </>
+                              ) : (
+                                <TouchableOpacity
                                   style={{
-                                    color: "#414042",
-                                    fontSize: 18,
-                                    fontWeight: "600",
-                                    fontFamily: "OpenSans-Regular",
+                                    backgroundColor: "#6fcd32",
+                                    borderRadius: 5,
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    alignSelf: "center",
+                                    textAlign: "center",
+                                    height: hp(6),
+                                    width: wp(39),
                                   }}
                                 >
-                                  Rs
-                                </Text>
-                                Rs{item.curency[0].biennially}
-                                <Text
-                                  style={{
-                                    color: "#414042",
-                                    fontSize: 18,
-                                    fontWeight: "600",
-                                    fontFamily: "OpenSans-Regular",
-                                  }}
-                                >
-                                  /2yrs
-                                </Text>
-                                <Text
-                                  style={{
-                                    color: "red",
-                                    fontSize: 20,
-                                    fontWeight: "700",
-                                    fontFamily: "OpenSans-Regular",
-                                  }}
-                                >
-                                  *
-                                </Text>
-                              </Text>
+                                  <Text
+                                    style={{
+                                      textAlign: "center",
+                                      color: "#fff",
+                                      fontFamily: "OpenSans-Regular",
+                                      fontSize: 18,
+                                      fontWeight: "700",
+                                    }}
+                                  >
+                                    Register
+                                  </Text>
+                                </TouchableOpacity>
+                              )}
                             </View>
-                          ) : (
-                            <View>
-                              <Text
-                                style={{
-                                  textAlign: "center",
-                                  color: "#414042",
-                                  fontFamily: "OpenSans-Regular",
-                                  fontSize: 20,
-                                  fontWeight: "700",
-                                }}
-                              >
-                                <Text
-                                  style={{
-                                    color: "#414042",
-                                    fontSize: 18,
-                                    fontWeight: "600",
-                                    fontFamily: "OpenSans-Regular",
-                                  }}
-                                >
-                                  Rs
-                                </Text>
-                                {item.curency[0].annually}
-                                <Text
-                                  style={{
-                                    color: "#414042",
-                                    fontSize: 18,
-                                    fontWeight: "600",
-                                    fontFamily: "OpenSans-Regular",
-                                  }}
-                                >
-                                  /yr
-                                </Text>
-                                <Text
-                                  style={{
-                                    color: "red",
-                                    fontSize: 20,
-                                    fontWeight: "700",
-                                    fontFamily: "OpenSans-Regular",
-                                  }}
-                                >
-                                  *
-                                </Text>
-                              </Text>
-                            </View>
-                          )}
+                          </TouchableWithoutFeedback>
                         </View>
                       </View>
                     ))}
@@ -511,103 +493,86 @@ const FindDomain = () => {
                     tldDomains.map((item, index) => (
                       <View key={index} style={{ paddingTop: 40 }}>
                         <View style={styles.dividerr}></View>
-                        <Text
-                          style={{
-                            textAlign: "center",
-                            color: "#005a7e",
-                            fontFamily: "OpenSans-Regular",
-                            fontSize: 20,
-                            fontWeight: "700",
-                            marginBottom: 10,
-                          }}
+                        <TouchableWithoutFeedback
+                          onPress={() => toggleTLDVisibility(item.name)}
                         >
-                          .{item.name}
-                        </Text>
-                        {item.name && item.name.endsWith("pk") ? (
-                          <Text
-                            style={{
-                              textAlign: "center",
-                              color: "#414042",
-                              fontFamily: "OpenSans-Regular",
-                              fontSize: 20,
-                              fontWeight: "700",
-                            }}
-                          >
-                            <Text
-                              style={{
-                                color: "#414042",
-                                fontSize: 18,
-                                fontWeight: "600",
-                                fontFamily: "OpenSans-Regular",
-                              }}
-                            >
-                              Rs
-                            </Text>
-                            Rs{item.curency[0].biennially}
-                            <Text
-                              style={{
-                                color: "#414042",
-                                fontSize: 18,
-                                fontWeight: "600",
-                                fontFamily: "OpenSans-Regular",
-                              }}
-                            >
-                              /2yrs
-                            </Text>
-                            <Text
-                              style={{
-                                color: "red",
-                                fontSize: 20,
-                                fontWeight: "700",
-                                fontFamily: "OpenSans-Regular",
-                              }}
-                            >
-                              *
-                            </Text>
-                          </Text>
-                        ) : (
-                          <Text
-                            style={{
-                              textAlign: "center",
-                              color: "#414042",
-                              fontFamily: "OpenSans-Regular",
-                              fontSize: 20,
-                              fontWeight: "700",
-                            }}
-                          >
-                            <Text
-                              style={{
-                                color: "#414042",
-                                fontSize: 18,
-                                fontWeight: "600",
-                                fontFamily: "OpenSans-Regular",
-                              }}
-                            >
-                              Rs
-                            </Text>
-                            {item.curency[0].annually}
-                            <Text
-                              style={{
-                                color: "#414042",
-                                fontSize: 18,
-                                fontWeight: "600",
-                                fontFamily: "OpenSans-Regular",
-                              }}
-                            >
-                              /yr
-                            </Text>
-                            <Text
-                              style={{
-                                color: "red",
-                                fontSize: 20,
-                                fontWeight: "700",
-                                fontFamily: "OpenSans-Regular",
-                              }}
-                            >
-                              *
-                            </Text>
-                          </Text>
-                        )}
+                          <View>
+                            {selectedTLD !== item.name ? (
+                              <>
+                                <Text
+                                  style={{
+                                    textAlign: "center",
+                                    color: "#005a7e",
+                                    fontFamily: "OpenSans-Regular",
+                                    fontSize: 20,
+                                    fontWeight: "700",
+                                    marginBottom: 10,
+                                  }}
+                                >
+                                  .{item.name}
+                                </Text>
+                                <Text
+                                  style={{
+                                    textAlign: "center",
+                                    color: "#414042",
+                                    fontFamily: "OpenSans-Regular",
+                                    fontSize: 20,
+                                    fontWeight: "700",
+                                  }}
+                                >
+                                  <Text
+                                    style={{
+                                      color: "#414042",
+                                      fontSize: 18,
+                                      fontWeight: "600",
+                                      fontFamily: "OpenSans-Regular",
+                                    }}
+                                  >
+                                    Rs
+                                  </Text>
+                                  {item.name && item.name.endsWith("pk")
+                                    ? `${item.curency[0].biennially}/2yrs`
+                                    : `${item.curency[0].annually}/yr`}
+                                  <Text
+                                    style={{
+                                      color: "red",
+                                      fontSize: 20,
+                                      fontWeight: "700",
+                                      fontFamily: "OpenSans-Regular",
+                                    }}
+                                  >
+                                    *
+                                  </Text>
+                                </Text>
+                              </>
+                            ) : (
+                              <TouchableOpacity
+                                style={{
+                                  backgroundColor: "#6fcd32",
+                                  borderRadius: 5,
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                  alignSelf: "center",
+                                  textAlign: "center",
+                                  height: hp(6),
+                                  width: wp(39),
+                                }}
+                              >
+                                <Text
+                                  style={{
+                                    textAlign: "center",
+                                    color: "#fff",
+                                    fontFamily: "OpenSans-Regular",
+                                    fontSize: 18,
+                                    fontWeight: "700",
+                                  }}
+                                >
+                                  Register
+                                </Text>
+                              </TouchableOpacity>
+                            )}
+                          </View>
+                        </TouchableWithoutFeedback>
                       </View>
                     ))}
 
@@ -616,103 +581,86 @@ const FindDomain = () => {
                     otherDomains.map((item, index) => (
                       <View key={index} style={{ paddingTop: 40 }}>
                         <View style={styles.dividerr}></View>
-                        <Text
-                          style={{
-                            textAlign: "center",
-                            color: "#005a7e",
-                            fontFamily: "OpenSans-Regular",
-                            fontSize: 20,
-                            fontWeight: "700",
-                            marginBottom: 10,
-                          }}
+                        <TouchableWithoutFeedback
+                          onPress={() => toggleTLDVisibility(item.name)}
                         >
-                          .{item.name}
-                        </Text>
-                        {item.name && item.name.endsWith("pk") ? (
-                          <Text
-                            style={{
-                              textAlign: "center",
-                              color: "#414042",
-                              fontFamily: "OpenSans-Regular",
-                              fontSize: 20,
-                              fontWeight: "700",
-                            }}
-                          >
-                            <Text
-                              style={{
-                                color: "#414042",
-                                fontSize: 18,
-                                fontWeight: "600",
-                                fontFamily: "OpenSans-Regular",
-                              }}
-                            >
-                              Rs
-                            </Text>
-                            Rs{item.curency[0].biennially}
-                            <Text
-                              style={{
-                                color: "#414042",
-                                fontSize: 18,
-                                fontWeight: "600",
-                                fontFamily: "OpenSans-Regular",
-                              }}
-                            >
-                              /2yrs
-                            </Text>
-                            <Text
-                              style={{
-                                color: "red",
-                                fontSize: 20,
-                                fontWeight: "700",
-                                fontFamily: "OpenSans-Regular",
-                              }}
-                            >
-                              *
-                            </Text>
-                          </Text>
-                        ) : (
-                          <Text
-                            style={{
-                              textAlign: "center",
-                              color: "#414042",
-                              fontFamily: "OpenSans-Regular",
-                              fontSize: 20,
-                              fontWeight: "700",
-                            }}
-                          >
-                            <Text
-                              style={{
-                                color: "#414042",
-                                fontSize: 18,
-                                fontWeight: "600",
-                                fontFamily: "OpenSans-Regular",
-                              }}
-                            >
-                              Rs
-                            </Text>
-                            {item.curency[0].annually}
-                            <Text
-                              style={{
-                                color: "#414042",
-                                fontSize: 18,
-                                fontWeight: "600",
-                                fontFamily: "OpenSans-Regular",
-                              }}
-                            >
-                              /yr
-                            </Text>
-                            <Text
-                              style={{
-                                color: "red",
-                                fontSize: 20,
-                                fontWeight: "700",
-                                fontFamily: "OpenSans-Regular",
-                              }}
-                            >
-                              *
-                            </Text>
-                          </Text>
-                        )}
+                          <View>
+                            {selectedTLD !== item.name ? (
+                              <>
+                                <Text
+                                  style={{
+                                    textAlign: "center",
+                                    color: "#005a7e",
+                                    fontFamily: "OpenSans-Regular",
+                                    fontSize: 20,
+                                    fontWeight: "700",
+                                    marginBottom: 10,
+                                  }}
+                                >
+                                  .{item.name}
+                                </Text>
+                                <Text
+                                  style={{
+                                    textAlign: "center",
+                                    color: "#414042",
+                                    fontFamily: "OpenSans-Regular",
+                                    fontSize: 20,
+                                    fontWeight: "700",
+                                  }}
+                                >
+                                  <Text
+                                    style={{
+                                      color: "#414042",
+                                      fontSize: 18,
+                                      fontWeight: "600",
+                                      fontFamily: "OpenSans-Regular",
+                                    }}
+                                  >
+                                    Rs
+                                  </Text>
+                                  {item.name && item.name.endsWith("pk")
+                                    ? `${item.curency[0].biennially}/2yrs`
+                                    : `${item.curency[0].annually}/yr`}
+                                  <Text
+                                    style={{
+                                      color: "red",
+                                      fontSize: 20,
+                                      fontWeight: "700",
+                                      fontFamily: "OpenSans-Regular",
+                                    }}
+                                  >
+                                    *
+                                  </Text>
+                                </Text>
+                              </>
+                            ) : (
+                              <TouchableOpacity
+                                style={{
+                                  backgroundColor: "#6fcd32",
+                                  borderRadius: 5,
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                  alignSelf: "center",
+                                  textAlign: "center",
+                                  height: hp(6),
+                                  width: wp(39),
+                                }}
+                              >
+                                <Text
+                                  style={{
+                                    textAlign: "center",
+                                    color: "#fff",
+                                    fontFamily: "OpenSans-Regular",
+                                    fontSize: 18,
+                                    fontWeight: "700",
+                                  }}
+                                >
+                                  Register
+                                </Text>
+                              </TouchableOpacity>
+                            )}
+                          </View>
+                        </TouchableWithoutFeedback>
                       </View>
                     ))}
                 </View>
