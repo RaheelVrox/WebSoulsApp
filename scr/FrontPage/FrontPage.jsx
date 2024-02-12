@@ -24,6 +24,8 @@ const FrontPage = () => {
   const [datadomain, setDomain] = useState("");
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState([]);
+  const [discounts, setDiscounts] = useState([]);
+
   const [error, setError] = useState("");
   const handleSearch = () => {
     console.log("search domain:", datadomain);
@@ -53,6 +55,22 @@ const FrontPage = () => {
   };
   useEffect(() => {
     Corporate();
+  }, []);
+  //ActivePromotions
+  const fetchActivePromotions = async () => {
+    setLoading(true);
+    try {
+      const url = `https://backend.websouls.com/api/currencies/getActivePromotions`;
+      const response = await axios.get(url);
+      setDiscounts(response.data);
+    } catch (error) {
+      console.error("Error fetching active promotions: ", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    fetchActivePromotions();
   }, []);
 
   return (
@@ -259,21 +277,60 @@ const FrontPage = () => {
                   marginTop: 15,
                 }}
               >
-                <Text style={styles.strikeThrough}>
-                  Normal Price: {item.currency[0].annually}
-                </Text>
-                <Text
-                  style={{
-                    fontSize: 20,
-                    textAlign: "center",
-                    color: "#fff",
-                    fontWeight: "bold",
-                    fontFamily: "OpenSans-Regular",
-                    marginBottom: 5,
-                  }}
-                >
-                  Rs21601/Yr<Text style={{ color: "red" }}>*</Text>
-                </Text>
+                {!discounts.some((discount) =>
+                  discount.appliesto.includes(item.pid)
+                ) && (
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      textAlign: "center",
+                      color: "#fff",
+                      fontWeight: "bold",
+                      fontFamily: "OpenSans-Regular",
+                      marginBottom: 5,
+                    }}
+                  >
+                    Normal Price: {item.currency[0].annually}/Yr
+                    <Text style={{ color: "red" }}>*</Text>
+                  </Text>
+                )}
+                {discounts
+                  .filter((discount) => discount.appliesto.includes(item.pid))
+                  .map((discount) => {
+                    // Calculate discounted price
+                    const discountedPrice =
+                      item.currency[0].annually * (1 - discount.value / 100);
+                    return (
+                      <View key={discount.id}>
+                        <Text
+                          style={{
+                            fontSize: 18,
+                            textAlign: "center",
+                            color: "#fff",
+                            fontWeight: "bold",
+                            fontFamily: "OpenSans-Regular",
+                            marginBottom: 5,
+                            textDecorationLine: "line-through",
+                          }}
+                        >
+                          Normal Price:{item.currency[0].annually}/Yr
+                        </Text>
+                        <Text
+                          style={{
+                            fontSize: 22,
+                            textAlign: "center",
+                            color: "#fff",
+                            fontWeight: "bold",
+                            fontFamily: "OpenSans-Regular",
+                            marginBottom: 5,
+                          }}
+                        >
+                          Rs{discountedPrice.toFixed(0)}/Yr
+                          <Text style={{ color: "red" }}>*</Text>
+                        </Text>
+                      </View>
+                    );
+                  })}
                 <Text
                   style={{
                     fontSize: 13,
@@ -285,48 +342,63 @@ const FrontPage = () => {
                 >
                   Rs{item.currency[0].annually}/Yr when you renew
                 </Text>
-                <View
-                  style={{
-                    backgroundColor: "#004e71",
-                    marginTop: 10,
-                    flexDirection: "row",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontSize: 13,
-                      color: "#fff",
-                      fontWeight: "700",
-                      fontFamily: "OpenSans-Regular",
-                    }}
-                  >
-                    On Sale - {""}
-                  </Text>
+                {discounts.some((discount) =>
+                  discount.appliesto.includes(item.pid)
+                ) && (
                   <View
                     style={{
-                      borderRadius: 5,
-                      backgroundColor: "#6fce32",
+                      flexDirection: "row",
                       justifyContent: "center",
                       alignItems: "center",
-                      height: hp(3.5),
-                      width: wp(25),
-                      marginBottom: 5,
+                      marginTop: 10,
+                      backgroundColor: "#004e71",
                     }}
                   >
                     <Text
                       style={{
                         color: "#fff",
-                        fontWeight: "700",
+                        fontWeight: "bold",
                         fontSize: 16,
                         fontFamily: "OpenSans-Regular",
                       }}
                     >
-                      Save 30%
+                      On Sale - {""}
                     </Text>
+                    {discounts
+                      .filter((discount) =>
+                        discount.appliesto.includes(item.pid)
+                      )
+                      .map((discount) => {
+                        if (discount.value > 0) {
+                          return (
+                            <View
+                              key={discount.id}
+                              style={{
+                                borderRadius: 5,
+                                backgroundColor: "#6fce32",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                height: hp(3.2),
+                                width: wp(22),
+                                marginBottom: 5,
+                              }}
+                            >
+                              <Text
+                                style={{
+                                  color: "#fff",
+                                  fontWeight: "700",
+                                  fontSize: 16,
+                                  fontFamily: "OpenSans-Regular",
+                                }}
+                              >
+                                Save {discount.value}%
+                              </Text>
+                            </View>
+                          );
+                        }
+                      })}
                   </View>
-                </View>
+                )}
               </View>
               <View style={{ marginTop: 25 }}>
                 {item.packageFeatures[0].features.map((feature, index) => {
