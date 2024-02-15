@@ -6,6 +6,7 @@ import Header from "../Component/Header";
 import SearchDomain from "../scr/SearchDomain/SearchDomain";
 import FrontPage from "../scr/FrontPage/FrontPage";
 import FindDomain from "../scr/SearchDomain/FindDomain";
+import GetStarted from "../scr/FrontPage/GetStarted";
 const StackNavigator = () => {
   const Stack = createNativeStackNavigator();
   return (
@@ -28,6 +29,13 @@ const StackNavigator = () => {
         <Stack.Screen
           name="FindDomain"
           component={FindDomain}
+          options={{
+            header: () => <Header />,
+          }}
+        />
+         <Stack.Screen
+          name="GetStarted"
+          component={GetStarted}
           options={{
             header: () => <Header />,
           }}

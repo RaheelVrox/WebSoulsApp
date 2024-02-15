@@ -113,7 +113,10 @@ const FrontPage = () => {
                 That's Worth it
               </Text>
             </View>
-            <TouchableOpacity style={{ width: "28%" }}>
+            <TouchableOpacity
+              style={{ width: "28%" }}
+              onPress={() => navigation.navigate("GetStarted")}
+            >
               <View style={styles.button}>
                 <Text style={styles.buttonText}>Get Started</Text>
               </View>
@@ -404,7 +407,7 @@ const FrontPage = () => {
                 {item.packageFeatures[0].features.map((feature, index) => {
                   // Use regular expression to match the "Resource Allocated" part
                   const match = feature.match(/^(.*?)_/);
-                  // Extract the matched part or use the whole feature if not matched
+                  // Extract the matched part or use the whole feature if not matche
                   const resourceAllocated = match ? match[1] : feature;
                   return (
                     <View key={index}>

@@ -4,6 +4,8 @@ import * as SplashScreen from "expo-splash-screen";
 import * as Font from "expo-font";
 import React, { useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
+import { Provider } from "react-redux";
+import store from "./scr/store/Store.js";
 
 export default function App() {
   const [isFontLoaded, setFontLoaded] = useState(false);
@@ -26,8 +28,10 @@ export default function App() {
   }
   return (
     <>
-      <StackNavigator />
-      <StatusBar style="auto" backgroundColor="#fff" />
+      <Provider store={store}>
+        <StackNavigator />
+        <StatusBar style="auto" backgroundColor="#fff" />
+      </Provider>
     </>
   );
 }

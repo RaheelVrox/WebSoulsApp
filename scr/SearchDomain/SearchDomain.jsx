@@ -10,7 +10,6 @@ import {
   Keyboard,
   ActivityIndicator,
   ScrollView,
-  Alert,
 } from "react-native";
 import { MaterialIcons, FontAwesome } from "@expo/vector-icons";
 import axios from "axios";
@@ -20,14 +19,17 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import MenuHeader from "../../Component/MenuHeader";
+import { useDispatch, useSelector } from "react-redux";
 
 const SearchDomain = ({ route }) => {
   const { datadomain } = route.params || {};
   const navigation = useNavigation();
+  const { domainSearchCart } = useSelector((state) => state.domainSearchCart);
   const [domain, setDomain] = useState(datadomain || "");
   const [response, setResponse] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
+  console.log("domainSearchCart : ", domainSearchCart);
 
   useEffect(() => {
     if (domain) {
@@ -57,6 +59,14 @@ const SearchDomain = ({ route }) => {
     } finally {
       setLoading(false);
     }
+  };
+  const dispatch = useDispatch();
+  const addToCart = (domainName, price) => {
+    dispatch({
+      type: "domainSearchCart",
+      payload: { domainName, price },
+    });
+    console.log("Item added to cart:", { domainName, price });
   };
 
   return (
@@ -211,7 +221,14 @@ const SearchDomain = ({ route }) => {
                                 Rs {suggestion.prices[0].annually}
                               </Text>
                             )}
-                          <TouchableOpacity>
+                          <TouchableOpacity
+                            onPress={() =>
+                              addToCart(
+                                suggestion.domainName,
+                                suggestion.prices[0].annually
+                              )
+                            }
+                          >
                             <FontAwesome
                               name="cart-plus"
                               size={24}
