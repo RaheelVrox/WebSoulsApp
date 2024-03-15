@@ -757,4 +757,5 @@ const styles = StyleSheet.create({
     backgroundColor: "#ededed",
     marginBottom: 30,
   },
+  
 });

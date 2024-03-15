@@ -18,6 +18,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import MenuHeader from "../../Component/MenuHeader";
 import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
 
 const FrontPage = () => {
   const navigation = useNavigation();
@@ -25,7 +26,8 @@ const FrontPage = () => {
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState([]);
   const [discounts, setDiscounts] = useState([]);
-
+  const { packageCart } = useSelector((state) => state.packageCart);
+  console.log("packageCart : ", packageCart);
   const [error, setError] = useState("");
   const handleSearch = () => {
     console.log("search domain:", datadomain);
@@ -72,6 +74,36 @@ const FrontPage = () => {
   useEffect(() => {
     fetchActivePromotions();
   }, []);
+
+  const dispatch = useDispatch();
+  const addToCart = (pid, price, name) => {
+    const discount = discounts.find((discount) =>
+      discount.appliesto.includes(pid)
+    );
+
+    // Calculate the final price based on discount
+    const finalPrice = discount ? price * (1 - discount.value / 100) : price;
+    dispatch({
+      type: "packageCart",
+      payload: {
+        pid,
+        price: finalPrice,
+        name,
+        discount: discount ? discount.value : 0,
+        freeDomain: [],
+        addons: [],
+      },
+    });
+    // console.log("Item added to cart:", {
+    //   pid,
+    //   finalPrice,
+    //   price,
+    //   name,
+    //   discount: discount ? discount.value : null,
+    // });
+    // Navigate to the cart screen
+    navigation.navigate("PackageFree");
+  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#000000" }}>
@@ -419,7 +451,13 @@ const FrontPage = () => {
                   );
                 })}
               </View>
-              <TouchableOpacity style={{ alignSelf: "center" }}>
+              <TouchableOpacity
+                style={{ alignSelf: "center" }}
+                onPress={
+                  () =>
+                    addToCart(item.pid, item.currency[0].annually, item.name) // Pass the name here
+                }
+              >
                 <View style={styles.startbutton}>
                   <Text style={styles.buttonText}>Get Started</Text>
                 </View>

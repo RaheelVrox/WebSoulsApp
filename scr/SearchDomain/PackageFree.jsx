@@ -21,21 +21,14 @@ import {
 import MenuHeader from "../../Component/MenuHeader";
 import { useDispatch, useSelector } from "react-redux";
 
-const SearchDomain = ({ route }) => {
-  const { datadomain } = route.params || {};
+const PackageFree = () => {
   const navigation = useNavigation();
   const { domainSearchCart } = useSelector((state) => state.domainSearchCart);
-  const [domain, setDomain] = useState(datadomain || "");
-  const [response, setResponse] = useState(null);
+  const [domain, setDomain] = useState();
+  const [response, setResponse] = useState();
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   console.log("domainSearchCart : ", domainSearchCart);
-
-  useEffect(() => {
-    if (domain) {
-      searchDomain();
-    }
-  }, [domain]);
 
   const searchDomain = async () => {
     if (!domain.trim()) {
@@ -67,7 +60,7 @@ const SearchDomain = ({ route }) => {
       payload: { domainName, price },
     });
     console.log("Item added to cart:", { domainName, price });
-     navigation.navigate("Cart");
+    navigation.navigate("Cart");
   };
 
   return (
@@ -100,7 +93,6 @@ const SearchDomain = ({ route }) => {
           >
             <TextInput
               style={styles.input}
-              defaultValue={datadomain}
               placeholder="Search your domain here..."
               placeholderTextColor="#a0a0a0"
               onChangeText={(text) => setDomain(text)}
@@ -111,88 +103,60 @@ const SearchDomain = ({ route }) => {
               </View>
             </TouchableOpacity>
           </View>
+          {loading && (
+            <View style={styles.loaderContainer}>
+              <ActivityIndicator size="large" color="#0000ff" />
+            </View>
+          )}
           <View style={{ paddingTop: 30 }}>
-            {loading ? (
-              <ActivityIndicator
-                size={50}
-                color="#0175a3"
+            {error && <Text style={styles.errorText}>{error}</Text>}
+
+            {!error && response && response.available !== 1 && (
+              <Text style={styles.errorText}>
+                <Text style={{ fontWeight: "700", color: "red" }}>
+                  Oops! Looks like
+                </Text>{" "}
+                <Text
+                  style={{ fontWeight: "bold", color: "red", fontSize: 16 }}
+                >
+                  "{domain}"
+                </Text>{" "}
+                <Text style={{ fontWeight: "700", color: "#414042" }}>
+                  is already registered.
+                </Text>
+              </Text>
+            )}
+
+            {!error && response && response.available === 1 && (
+              <Text
                 style={{
-                  alignSelf: "center",
-                  justifyContent: "center",
+                  color: "#414042",
+                  fontSize: 15,
+                  fontFamily: "OpenSans-Regular",
+                  fontWeight: "700",
+                  lineHeight: 28,
+                  paddingLeft: 20,
+                  paddingRight: 10,
                 }}
-              />
-            ) : error ? (
-              <Text style={styles.errorText}>{error}</Text>
-            ) : response && response.available === 5 ? (
-              <Text style={styles.errorText}>
-                Please search valid domain name/tld.
+              >
+                <Text style={{ fontWeight: "700", color: "#414042" }}>
+                  Congratulations! Your domain
+                </Text>{" "}
+                <Text
+                  style={{
+                    fontWeight: "600",
+                    color: "#6fcd31",
+                    fontSize: 16,
+                  }}
+                >
+                  "{domain}"
+                </Text>{" "}
+                is available
               </Text>
-            ) : response && response.available === 2 ? (
-              <Text style={styles.errorText}>
-                Sorry domain must have valid TLD
-              </Text>
-            ) : (
+            )}
+
+            {!error && response && response.suggestions && (
               <>
-                {response && response.available === 1 ? (
-                  <Text
-                    style={{
-                      color: "#414042",
-                      fontSize: 15,
-                      fontFamily: "OpenSans-Regular",
-                      fontWeight: "700",
-                      lineHeight: 28,
-                      paddingLeft: 20,
-                      paddingRight: 10,
-                    }}
-                  >
-                    <Text style={{ fontWeight: "700", color: "#414042" }}>
-                      Congratulations! Your domain
-                    </Text>{" "}
-                    <Text
-                      style={{
-                        fontWeight: "600",
-                        color: "#6fcd31",
-                        fontSize: 16,
-                      }}
-                    >
-                      "{domain}"
-                    </Text>{" "}
-                    is available
-                  </Text>
-                ) : (
-                  <Text
-                    style={{
-                      color: "#414042",
-                      fontFamily: "OpenSans-Regular",
-                      fontWeight: "700",
-                      marginHorizontal: 20,
-                      fontSize: 15,
-                    }}
-                  >
-                    <Text
-                      style={{
-                        fontWeight: "700",
-                        color: "red",
-                        fontFamily: "OpenSans-Regular",
-                      }}
-                    >
-                      Oops! Looks like
-                    </Text>{" "}
-                    <Text
-                      style={{
-                        fontWeight: "bold",
-                        color: "red",
-                        fontFamily: "OpenSans-Regular",
-                        fontSize: 16,
-                      }}
-                    >
-                      "{domain}"
-                    </Text>{" "}
-                    <Text style={{ fontWeight: "700", color: "#414042" }}>
-                      is already registered.
-                    </Text>
-                  </Text>
-                )}
                 <Text
                   style={{
                     color: "#414042",
@@ -205,58 +169,39 @@ const SearchDomain = ({ route }) => {
                 >
                   MORE SUGGESTION
                 </Text>
-
-                {/* Render suggestions */}
                 <View style={styles.suggestionContainer}>
-                  {response &&
-                    response.suggestions &&
-                    response.suggestions.map((suggestion, index) => (
-                      <View key={index}>
-                        <View style={styles.suggestionItem}>
-                          <Text style={styles.suggestionText}>
-                            {suggestion.domainName}
+                  {response.suggestions.map((suggestion, index) => (
+                    <View key={index}>
+                      <View style={styles.suggestionItem}>
+                        <Text style={styles.suggestionText}>
+                          {suggestion.domainName}
+                        </Text>
+                        {suggestion.prices && suggestion.prices.length > 0 && (
+                          <Text style={styles.priceText}>
+                            Rs {suggestion.prices[0].annually}
                           </Text>
-                          {suggestion.prices &&
-                            suggestion.prices.length > 0 && (
-                              <Text style={styles.priceText}>
-                                Rs {suggestion.prices[0].annually}
-                              </Text>
-                            )}
-                          <TouchableOpacity
-                            onPress={() =>
-                              addToCart(
-                                suggestion.domainName,
-                                suggestion.prices[0].annually
-                              )
-                            }
-                          >
-                            <FontAwesome
-                              name="cart-plus"
-                              size={24}
-                              color="#005880"
-                            />
-                          </TouchableOpacity>
-                        </View>
-                        {index < response.suggestions.length - 1 && (
-                          <View style={styles.divider} />
                         )}
+                        <TouchableOpacity
+                          onPress={() =>
+                            addToCart(
+                              suggestion.domainName,
+                              suggestion.prices[0].annually
+                            )
+                          }
+                        >
+                          <FontAwesome
+                            name="cart-plus"
+                            size={24}
+                            color="#005880"
+                          />
+                        </TouchableOpacity>
                       </View>
-                    ))}
+                      {index < response.suggestions.length - 1 && (
+                        <View style={styles.divider} />
+                      )}
+                    </View>
+                  ))}
                 </View>
-
-                <TouchableOpacity
-                  style={{ marginHorizontal: 20, width: "28%" }}
-                >
-                  <View style={styles.getbutton}>
-                    <Text style={styles.buttonText}>Get Domain</Text>
-                    <MaterialIcons
-                      name="keyboard-arrow-right"
-                      size={29}
-                      color="#fff"
-                      style={{ marginLeft: 10 }}
-                    />
-                  </View>
-                </TouchableOpacity>
               </>
             )}
           </View>
@@ -266,7 +211,7 @@ const SearchDomain = ({ route }) => {
   );
 };
 
-export default SearchDomain;
+export default PackageFree;
 
 const styles = StyleSheet.create({
   container: {
@@ -302,6 +247,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderTopRightRadius: 5,
     borderBottomRightRadius: 5,
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   getbutton: {
     flexDirection: "row",

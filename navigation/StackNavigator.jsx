@@ -7,6 +7,8 @@ import SearchDomain from "../scr/SearchDomain/SearchDomain";
 import FrontPage from "../scr/FrontPage/FrontPage";
 import FindDomain from "../scr/SearchDomain/FindDomain";
 import GetStarted from "../scr/FrontPage/GetStarted";
+import Cart from "../scr/Cart/Cart";
+import PackageFree from "../scr/SearchDomain/PackageFree";
 const StackNavigator = () => {
   const Stack = createNativeStackNavigator();
   return (
@@ -33,9 +35,23 @@ const StackNavigator = () => {
             header: () => <Header />,
           }}
         />
-         <Stack.Screen
+        <Stack.Screen
           name="GetStarted"
           component={GetStarted}
+          options={{
+            header: () => <Header />,
+          }}
+        />
+        <Stack.Screen
+          name="Cart"
+          component={Cart}
+          options={{
+            header: () => <Header />,
+          }}
+        />
+        <Stack.Screen
+          name="PackageFree"
+          component={PackageFree}
           options={{
             header: () => <Header />,
           }}
