@@ -29,6 +29,7 @@ const SearchDomain = ({ route }) => {
   const [response, setResponse] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [addedDomains, setAddedDomains] = useState([]);
   console.log("domainSearchCart : ", domainSearchCart);
 
   useEffect(() => {
@@ -67,7 +68,8 @@ const SearchDomain = ({ route }) => {
       payload: { domainName, price },
     });
     console.log("Item added to cart:", { domainName, price });
-     navigation.navigate("Cart");
+    setAddedDomains([...addedDomains, domainName]);
+    navigation.navigate("Cart");
   };
 
   return (
@@ -193,13 +195,48 @@ const SearchDomain = ({ route }) => {
                     </Text>
                   </Text>
                 )}
+                {!error && response && response.available === 1 && (
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      // justifyContent: "space-between",
+                      marginHorizontal: 20,
+                      paddingTop: 15,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontWeight: "600",
+                        color: "#414042",
+                        fontSize: 16,
+                        fontFamily: "OpenSans-Regular",
+                      }}
+                    >
+                      {domain}
+                    </Text>
+                    <TouchableOpacity
+                      onPress={() =>
+                        !addedDomains.includes(domain) &&
+                        addToCart(domain, response.price[0].annually)
+                      }
+                    >
+                      <FontAwesome
+                        name="cart-plus"
+                        size={24}
+                        color={
+                          addedDomains.includes(domain) ? "#d3d3d3" : "#005880"
+                        }
+                      />
+                    </TouchableOpacity>
+                  </View>
+                )}
                 <Text
                   style={{
                     color: "#414042",
                     fontSize: 16,
                     fontFamily: "OpenSans-Regular",
                     fontWeight: "bold",
-                    paddingTop: 40,
+                    paddingTop: 20,
                     paddingHorizontal: 20,
                   }}
                 >
@@ -224,6 +261,7 @@ const SearchDomain = ({ route }) => {
                             )}
                           <TouchableOpacity
                             onPress={() =>
+                              !addedDomains.includes(suggestion.domainName) &&
                               addToCart(
                                 suggestion.domainName,
                                 suggestion.prices[0].annually
@@ -233,7 +271,11 @@ const SearchDomain = ({ route }) => {
                             <FontAwesome
                               name="cart-plus"
                               size={24}
-                              color="#005880"
+                              color={
+                                addedDomains.includes(suggestion.domainName)
+                                  ? "#d3d3d3"
+                                  : "#005880"
+                              }
                             />
                           </TouchableOpacity>
                         </View>

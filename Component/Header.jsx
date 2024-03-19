@@ -14,10 +14,17 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+import { useSelector } from "react-redux";
 
 const Header = () => {
   const [showOptions, setShowOptions] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState("PKR");
+  const packageCartItemCount = useSelector(
+    (state) => state.packageCart.packageCart.length
+  );
+  const domainSearchCartItemCount = useSelector(
+    (state) => state.domainSearchCart.domainSearchCart.length
+  );
 
   const toggleOptions = () => {
     setShowOptions(!showOptions);
@@ -99,6 +106,13 @@ const Header = () => {
           </Text>
           <TouchableOpacity>
             <FontAwesome name="shopping-cart" size={24} color="#fff" />
+            {packageCartItemCount + domainSearchCartItemCount > 0 && (
+              <View style={styles.cartCount}>
+                <Text style={styles.cartCountText}>
+                  {packageCartItemCount + domainSearchCartItemCount}
+                </Text>
+              </View>
+            )}
           </TouchableOpacity>
         </View>
       </View>
@@ -165,5 +179,21 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: "#e1e1e1",
     marginVertical: 15,
+  },
+  cartCount: {
+    position: "absolute",
+    backgroundColor: "red",
+    borderRadius: 10,
+    width: 20,
+    height: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    right: -5,
+    top: -5,
+  },
+  cartCountText: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "bold",
   },
 });

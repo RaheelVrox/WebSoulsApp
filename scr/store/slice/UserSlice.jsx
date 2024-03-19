@@ -29,6 +29,9 @@ export const pakageCartSetReducer = createReducer(
       })
       .addCase("uppackageCart", (state, action) => {
         state.packageCart = [...action.payload];
+      })
+      .addCase("addonespackagecart", (state, action) => {
+        state.packageCart = [...action.payload];
       });
   }
 );
