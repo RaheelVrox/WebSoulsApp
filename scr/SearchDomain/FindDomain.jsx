@@ -186,7 +186,12 @@ const FindDomain = () => {
                   placeholder="Find your perfect domain name..."
                   placeholderTextColor="#a0a0a0"
                   onChangeText={(text) => {
-                    setDomain(text);
+                    const trimmedText = text.replace(/\. +/g, ".");
+                    const lowercaseText = trimmedText.replace(
+                      /\.([A-Z])/g,
+                      (match, p1) => `.${p1.toLowerCase()}`
+                    );
+                    setDomain(lowercaseText);
                   }}
                 />
                 <TouchableOpacity onPress={handleSearch}>
@@ -757,5 +762,4 @@ const styles = StyleSheet.create({
     backgroundColor: "#ededed",
     marginBottom: 30,
   },
-  
 });

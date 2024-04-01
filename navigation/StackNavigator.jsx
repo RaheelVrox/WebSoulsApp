@@ -9,6 +9,12 @@ import FindDomain from "../scr/SearchDomain/FindDomain";
 import GetStarted from "../scr/FrontPage/GetStarted";
 import Cart from "../scr/Cart/Cart";
 import PackageFree from "../scr/SearchDomain/PackageFree";
+import HostingPackage from "../scr/HostingPackage/HostingPackage";
+import UserRegistration from "../scr/UserRegistration/UserRegistration";
+import Login from "../scr/Login/Login";
+import GetOrders from "../scr/GetOrder/GetOrders";
+import GetInvoices from "../scr/GetOrder/GetInvoices";
+import PaymentMethod from "../scr/PaymentMethods/PaymentMethod";
 const StackNavigator = () => {
   const Stack = createNativeStackNavigator();
   return (
@@ -52,6 +58,48 @@ const StackNavigator = () => {
         <Stack.Screen
           name="PackageFree"
           component={PackageFree}
+          options={{
+            header: () => <Header />,
+          }}
+        />
+        <Stack.Screen
+          name="HostingPackage"
+          component={HostingPackage}
+          options={{
+            header: () => <Header />,
+          }}
+        />
+        <Stack.Screen
+          name="UserRegistration"
+          component={UserRegistration}
+          options={{
+            header: () => <Header />,
+          }}
+        />
+        <Stack.Screen
+          name="Login"
+          component={Login}
+          options={{
+            header: () => <Header />,
+          }}
+        />
+        <Stack.Screen
+          name="GetOrders"
+          component={GetOrders}
+          options={{
+            header: () => <Header />,
+          }}
+        />
+        <Stack.Screen
+          name="GetInvoices"
+          component={GetInvoices}
+          options={{
+            header: () => <Header />,
+          }}
+        />
+        <Stack.Screen
+          name="PaymentMethod"
+          component={PaymentMethod}
           options={{
             header: () => <Header />,
           }}

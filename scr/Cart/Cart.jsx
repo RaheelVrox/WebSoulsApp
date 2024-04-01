@@ -13,6 +13,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+import { useNavigation } from "@react-navigation/native";
 
 // freeDomain
 const GetPackageFreeDomains = async (pid) => {
@@ -34,6 +35,7 @@ const Cart = () => {
   const [loading, setLoading] = useState(false);
   const [addAddone, setAddone] = useState([]);
   const [addedItems, setAddedItems] = useState([]);
+  const navigation = useNavigation();
 
   // Add Addones
   const showAddons = async () => {
@@ -42,7 +44,10 @@ const Cart = () => {
       const url = `https://billing.websouls.com/adM_iN_Dir/custom/package_addon_node_new.php?package_id=11,2,25,33`;
       const addAddone = await axios.get(url);
       setAddone(addAddone.data);
-      // console.log("Fetched Addons:", addAddone.data);
+      if (addAddone.data.length > 0) {
+        const firstAddon = addAddone.data[0];
+        addToCartAddones(firstAddon.name, firstAddon.pricing[3].annually);
+      }
     } catch (error) {
       console.error("Error fetching data: ", error);
       setError(error.message);
@@ -50,6 +55,7 @@ const Cart = () => {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     showAddons();
   }, []);
@@ -62,6 +68,7 @@ const Cart = () => {
       payload: updatedPackageCart,
     });
   };
+
   // remove an addon from the packageCart
   const removeAddon = (pid, addonIndex) => {
     const updatedPackageCart = packageCart.map((item) => {
@@ -89,26 +96,33 @@ const Cart = () => {
     const lastItemIndex = packageCart.length - 1;
     const lastItem = packageCart[lastItemIndex];
     const addon = { name: name, price: Priceing };
-
     // Check if lastItem exists before accessing addons
     if (lastItem && lastItem.addons) {
-      const updatedLastItem = {
-        ...lastItem,
-        addons: [...lastItem.addons, addon],
-      };
-      const updatedPackageCart = packageCart.map((item, index) =>
-        index === lastItemIndex ? updatedLastItem : item
+      // Check if the addon already exists in the packageCart
+      const existingAddonIndex = lastItem.addons.findIndex(
+        (item) => item.name === name
       );
-      setAddedItems([...addedItems, name]);
+      if (existingAddonIndex === -1) {
+        const updatedLastItem = {
+          ...lastItem,
+          addons: [...lastItem.addons, addon],
+        };
+        const updatedPackageCart = packageCart.map((item, index) =>
+          index === lastItemIndex ? updatedLastItem : item
+        );
+        setAddedItems([...addedItems, name]);
 
-      dispatch({
-        type: "addonespackagecart",
-        payload: updatedPackageCart,
-      });
+        dispatch({
+          type: "addonespackagecart",
+          payload: updatedPackageCart,
+        });
+      } else {
+        console.log("Addon already exists in the packageCart.");
+      }
     }
   };
 
-  // console.log("Package Cart update:", JSON.stringify(packageCart, null, 2));
+  // console.log("Package Cart update adones:", JSON.stringify(packageCart, null, 2));
 
   // remove a domain from the domain search cart
   const removeDomain = (domainName) => {
@@ -204,85 +218,120 @@ const Cart = () => {
     }
   }, [packageCart, domainSearchCart]);
 
+  // Calculate subtotal
+  const calculateSubtotal = () => {
+    let subtotal = 0;
+    packageCart.forEach((item) => {
+      subtotal += parseInt(item.price);
+      item.addons.forEach((addon) => {
+        subtotal += parseInt(addon.price);
+      });
+    });
+    domainSearchCart.forEach((domain) => {
+      subtotal += parseInt(domain.price);
+    });
+    return subtotal;
+  };
+  //  calculate GST/VAT at 5%
+  const calculateGSTVAT = (subtotal) => {
+    const GSTVATPercentage = 5; // 5% GST/VAT
+    const GSTVAT = (subtotal * GSTVATPercentage) / 100;
+    return GSTVAT;
+  };
+  //  calculate total price including GST/VAT
+  const calculateTotalPrice = () => {
+    const subtotal = calculateSubtotal();
+    const GSTVAT = calculateGSTVAT(subtotal);
+    const totalPrice = subtotal + GSTVAT;
+    return totalPrice;
+  };
+
   return (
-    <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
+    <ScrollView
+      style={{ flex: 1, backgroundColor: "#fff" }}
+      showsVerticalScrollIndicator={false}
+    >
       <View style={styles.container}>
-        <Text style={styles.Bundle}>Our Bundle Boosters</Text>
         <View>
-          {addAddone.map((item) => (
-            <View
-              key={item.id}
-              style={{
-                backgroundColor: "#f8f8f8",
-                padding: 20,
-                marginTop: 20,
-              }}
-            >
-              <Text
-                style={{
-                  textAlign: "center",
-                  color: "#4d4e4f",
-                  fontWeight: "bold",
-                  fontSize: 20,
-                  marginBottom: 5,
-                  fontFamily: "OpenSans-Regular",
-                  textTransform: "uppercase",
-                }}
-              >
-                {item.name.toUpperCase()}
-              </Text>
-              <Text
-                style={{
-                  textAlign: "center",
-                  color: "black",
-                  fontWeight: "700",
-                  fontSize: 15,
-                  marginBottom: 5,
-                  fontFamily: "OpenSans-Regular",
-                }}
-              >
-                {item.customAddonField}
-              </Text>
-              <Text
-                style={{
-                  color: "black",
-                  fontWeight: "400",
-                  fontSize: 14,
-                  marginBottom: 5,
-                  fontFamily: "OpenSans-Regular",
-                }}
-              >
-                {item.description}
-              </Text>
-              <Text
-                style={{
-                  fontSize: 18,
-                  textAlign: "center",
-                  color: "black",
-                  fontWeight: "bold",
-                  fontFamily: "OpenSans-Regular",
-                }}
-              >
-                {item.pricing[3].annually}/Yr
-              </Text>
-              <TouchableOpacity
-                style={[
-                  styles.startbutton,
-                  {
-                    backgroundColor: addedItems.includes(item.name)
-                      ? "#d3d3d3"
-                      : "#005880",
-                  },
-                ]}
-                onPress={() =>
-                  addToCartAddones(item.name, item.pricing[3].annually)
-                }
-                disabled={addedItems.includes(item.name)}
-              >
-                <Text style={styles.buttonText}>Add to cart</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
+          {packageCart.length > 0 && (
+            <>
+              <Text style={styles.Bundle}>Our Bundle Boosters</Text>
+              {addAddone.map((item) => (
+                <View
+                  key={item.id}
+                  style={{
+                    backgroundColor: "#f8f8f8",
+                    padding: 20,
+                    marginTop: 20,
+                  }}
+                >
+                  <Text
+                    style={{
+                      textAlign: "center",
+                      color: "#4d4e4f",
+                      fontWeight: "bold",
+                      fontSize: 20,
+                      marginBottom: 5,
+                      fontFamily: "OpenSans-Regular",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    {item.name.toUpperCase()}
+                  </Text>
+                  <Text
+                    style={{
+                      textAlign: "center",
+                      color: "black",
+                      fontWeight: "700",
+                      fontSize: 15,
+                      marginBottom: 5,
+                      fontFamily: "OpenSans-Regular",
+                    }}
+                  >
+                    {item.customAddonField}
+                  </Text>
+                  <Text
+                    style={{
+                      color: "black",
+                      fontWeight: "400",
+                      fontSize: 14,
+                      marginBottom: 5,
+                      fontFamily: "OpenSans-Regular",
+                    }}
+                  >
+                    {item.description}
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      textAlign: "center",
+                      color: "black",
+                      fontWeight: "bold",
+                      fontFamily: "OpenSans-Regular",
+                    }}
+                  >
+                    {item.pricing[3].annually}/Yr
+                  </Text>
+                  <TouchableOpacity
+                    style={[
+                      styles.startbutton,
+                      {
+                        backgroundColor: addedItems.includes(item.name)
+                          ? "#d3d3d3"
+                          : "#005880",
+                      },
+                    ]}
+                    onPress={() =>
+                      addToCartAddones(item.name, item.pricing[3].annually)
+                    }
+                    disabled={addedItems.includes(item.name)}
+                  >
+                    <Text style={styles.buttonText}>Add to cart</Text>
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </>
+          )}
         </View>
         <Text style={styles.header}>Order Summary</Text>
         {packageCart.map((item) => (
@@ -449,6 +498,127 @@ const Cart = () => {
             <View style={styles.divider} />
           </View>
         ))}
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            paddingTop: 15,
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 16,
+              fontFamily: "OpenSans-Regular",
+            }}
+          >
+            Subtotal:
+          </Text>
+          <Text
+            style={{
+              fontSize: 16,
+              fontFamily: "OpenSans-Regular",
+            }}
+          >
+            Rs: {calculateSubtotal()}
+          </Text>
+        </View>
+        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+          <Text
+            style={{
+              fontSize: 16,
+              fontFamily: "OpenSans-Regular",
+            }}
+          >
+            GST / VAT @ 5%:
+          </Text>
+          <Text
+            style={{
+              fontSize: 16,
+              fontFamily: "OpenSans-Regular",
+            }}
+          >
+            Rs: {parseInt(calculateGSTVAT(calculateSubtotal()))}
+          </Text>
+        </View>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            paddingTop: 15,
+            marginBottom: 15,
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 16,
+              fontFamily: "OpenSans-Regular",
+              fontWeight: "700",
+            }}
+          >
+            Total Price:
+          </Text>
+          <Text
+            style={{
+              fontSize: 16,
+              fontFamily: "OpenSans-Regular",
+              fontWeight: "700",
+            }}
+          >
+            Rs: {parseInt(calculateTotalPrice())}
+          </Text>
+        </View>
+        <View style={styles.divider} />
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-around",
+            alignItems: "center",
+            paddingTop: 30,
+            marginBottom: 30,
+          }}
+        >
+          <>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("FrontPage")}
+              style={{
+                height: hp(6),
+                width: wp(46),
+                backgroundColor: "#fff",
+                justifyContent: "center",
+                alignItems: "center",
+                borderWidth: 1,
+                borderColor: "#4A5F71",
+                borderRadius: 5,
+              }}
+            >
+              <Text
+                style={{
+                  fontFamily: "OpenSans-Regular",
+                  fontSize: 16,
+                  fontWeight: "600",
+                  color: "#000000",
+                }}
+              >
+                Continue shopping
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("UserRegistration")}
+              style={{
+                height: hp(6),
+                width: wp(32),
+                backgroundColor: "#005880",
+                justifyContent: "center",
+                alignItems: "center",
+                borderRadius: 5,
+                borderWidth: 1,
+                borderColor: "#4A5F71",
+              }}
+            >
+              <Text style={styles.buttonText}>CheckOut</Text>
+            </TouchableOpacity>
+          </>
+        </View>
       </View>
     </ScrollView>
   );

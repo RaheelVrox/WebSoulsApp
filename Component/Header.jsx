@@ -15,9 +15,11 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import { useSelector } from "react-redux";
+import { useNavigation } from "@react-navigation/native";
 
 const Header = () => {
   const [showOptions, setShowOptions] = useState(false);
+  const navigation = useNavigation();
   const [selectedCurrency, setSelectedCurrency] = useState("PKR");
   const packageCartItemCount = useSelector(
     (state) => state.packageCart.packageCart.length
@@ -104,7 +106,9 @@ const Header = () => {
           >
             +923214776995
           </Text>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("UserRegistration")}
+          >
             <FontAwesome name="shopping-cart" size={24} color="#fff" />
             {packageCartItemCount + domainSearchCartItemCount > 0 && (
               <View style={styles.cartCount}>

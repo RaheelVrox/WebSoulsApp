@@ -10,6 +10,7 @@ import {
   Keyboard,
   ActivityIndicator,
   ScrollView,
+  Modal,
 } from "react-native";
 import { MaterialIcons, FontAwesome } from "@expo/vector-icons";
 import axios from "axios";
@@ -30,8 +31,9 @@ const SearchDomain = ({ route }) => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [addedDomains, setAddedDomains] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedHosting, setSelectedHosting] = useState(null);
   console.log("domainSearchCart : ", domainSearchCart);
-
   useEffect(() => {
     if (domain) {
       searchDomain();
@@ -61,15 +63,34 @@ const SearchDomain = ({ route }) => {
       setLoading(false);
     }
   };
+
   const dispatch = useDispatch();
+
   const addToCart = (domainName, price) => {
     dispatch({
       type: "domainSearchCart",
       payload: { domainName, price },
     });
-    console.log("Item added to cart:", { domainName, price });
     setAddedDomains([...addedDomains, domainName]);
-    navigation.navigate("Cart");
+    openModal();
+  };
+
+  const openModal = () => {
+    setModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+  };
+
+  const handleHostingSelection = (selection) => {
+    setSelectedHosting(selection);
+    setModalVisible(false);
+    if (selection === "yes") {
+      navigation.navigate("HostingPackage");
+    } else {
+      navigation.navigate("Cart");
+    }
   };
 
   return (
@@ -105,7 +126,7 @@ const SearchDomain = ({ route }) => {
               defaultValue={datadomain}
               placeholder="Search your domain here..."
               placeholderTextColor="#a0a0a0"
-              onChangeText={(text) => setDomain(text)}
+              onChangeText={(text) => setDomain(text.replace(/\s/g, ""))}
             />
             <TouchableOpacity onPress={searchDomain}>
               <View style={styles.searchButton}>
@@ -199,7 +220,7 @@ const SearchDomain = ({ route }) => {
                   <View
                     style={{
                       flexDirection: "row",
-                      // justifyContent: "space-between",
+                      justifyContent: "space-between",
                       marginHorizontal: 20,
                       paddingTop: 15,
                     }}
@@ -286,19 +307,47 @@ const SearchDomain = ({ route }) => {
                     ))}
                 </View>
 
-                <TouchableOpacity
-                  style={{ marginHorizontal: 20, width: "28%" }}
+                {/* Modal */}
+                <Modal
+                  animationType="slide"
+                  transparent={true}
+                  visible={modalVisible}
+                  onRequestClose={closeModal}
                 >
-                  <View style={styles.getbutton}>
-                    <Text style={styles.buttonText}>Get Domain</Text>
-                    <MaterialIcons
-                      name="keyboard-arrow-right"
-                      size={29}
-                      color="#fff"
-                      style={{ marginLeft: 10 }}
-                    />
+                  <View style={styles.modalContainer}>
+                    <View style={styles.modalView}>
+                      <Text style={styles.modalText}>
+                        Leaving without an EMAIL ACCOUNT? Check out our hosting
+                        packages that come with a FREE DOMAIN too!
+                      </Text>
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          justifyContent: "space-evenly",
+                        }}
+                      >
+                        <TouchableOpacity
+                          style={[
+                            styles.modalButton,
+                            { backgroundColor: "#6fce32" },
+                          ]}
+                          onPress={() => handleHostingSelection("yes")}
+                        >
+                          <Text style={styles.buttonText}>Get Hosting</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          style={[
+                            styles.modalButton,
+                            { backgroundColor: "#005880" },
+                          ]}
+                          onPress={() => handleHostingSelection("no")}
+                        >
+                          <Text style={styles.buttonText}>Maybe Later</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
                   </View>
-                </TouchableOpacity>
+                </Modal>
               </>
             )}
           </View>
@@ -317,7 +366,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1.5,
-    backgroundColor: "#414042",
+    backgroundColor: "#dcdcdc",
     marginVertical: 15,
   },
   input: {
@@ -345,24 +394,6 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 5,
     borderBottomRightRadius: 5,
   },
-  getbutton: {
-    flexDirection: "row",
-    borderRadius: 5,
-    backgroundColor: "#6fce32",
-    justifyContent: "center",
-    alignItems: "center",
-    height: hp(6),
-    width: wp(39),
-    marginTop: 30,
-    marginBottom: 30,
-  },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 16,
-    fontFamily: "OpenSans-Regular",
-    alignSelf: "center",
-  },
   suggestionContainer: {
     paddingHorizontal: 20,
     paddingTop: 30,
@@ -388,16 +419,54 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     right: 55,
   },
-  divider: {
-    height: 1,
-    backgroundColor: "#dcdcdc",
-    marginVertical: 10,
-  },
   errorText: {
     color: "red",
     fontFamily: "OpenSans-Regular",
     fontSize: 15,
     fontWeight: "700",
     marginHorizontal: 22,
+  },
+  // Modal styles
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: "center",
+    fontSize: 16,
+    fontWeight: "bold",
+    lineHeight: 24,
+  },
+  modalButton: {
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    height: hp(5),
+    width: wp(28),
+    marginTop: 30,
+    marginHorizontal: 15,
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    textAlign: "center",
   },
 });

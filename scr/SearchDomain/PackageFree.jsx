@@ -99,7 +99,14 @@ const PackageFree = () => {
               style={styles.input}
               placeholder="Search your domain here..."
               placeholderTextColor="#a0a0a0"
-              onChangeText={(text) => setDomain(text)}
+              onChangeText={(text) => {
+                const trimmedText = text.replace(/\. +/g, ".");
+                const lowercaseText = trimmedText.replace(
+                  /\.([A-Z])/g,
+                  (match, p1) => `.${p1.toLowerCase()}`
+                );
+                setDomain(lowercaseText);
+              }}
             />
             <TouchableOpacity onPress={searchDomain}>
               <View style={styles.searchButton}>
