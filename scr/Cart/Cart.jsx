@@ -13,7 +13,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 
 // freeDomain
 const GetPackageFreeDomains = async (pid) => {
@@ -59,6 +59,16 @@ const Cart = () => {
   useEffect(() => {
     showAddons();
   }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      return () => {
+        // Clear package cart and domain search cart when navigating back
+        dispatch({ type: "uppackageCart", payload: [] });
+        dispatch({ type: "updomainSearchCart", payload: [] });
+      };
+    }, [dispatch])
+  );
 
   //  remove a package from the packagecart
   const removePackage = (pid) => {
